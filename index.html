@@ -168,6 +168,10 @@ tr:nth-child(even) td { background: #f5f9ff; }
       <div class="dark-title" id="stats-title">Stats Reali</div>
       <div class="stats-grid" id="stats-grid"></div>
     </div>
+    <div class="dark-box" style="padding:20px 20px 10px">
+      <div class="dark-title" style="margin-bottom:16px">GROSS CUMULATIVE P&amp;L</div>
+      <canvas id="pnl-canvas" style="width:100%;display:block"></canvas>
+    </div>
     <div class="white-box">
       <h3>Grafico Risultati per mese</h3>
       <div id="chart"></div>
@@ -431,7 +435,125 @@ function renderChart() {
     sc("$"+std, "Std Deviation", "");
   document.getElementById("stats-grid").innerHTML = statsHtml;
 
-  // Grafico a barre
+  // === GRAFICO LINEARE CUMULATIVO ===
+  var canvas = document.getElementById('pnl-canvas');
+  var dpr = window.devicePixelRatio || 1;
+  var W = canvas.parentElement.clientWidth - 40;
+  var H = 260;
+  canvas.width = W * dpr;
+  canvas.height = H * dpr;
+  canvas.style.width = W + 'px';
+  canvas.style.height = H + 'px';
+  var ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  // Costruisce punti cumulativi per data
+  var sorted = filtered.slice().sort(function(a,b){ return a.data > b.data ? 1 : -1; });
+  var points = [{date: null, cum: 0}]; // parte da 0
+  var cum = 0;
+  for (var i = 0; i < sorted.length; i++) {
+    cum += sorted[i].risultato;
+    points.push({date: sorted[i].data, cum: cum});
+  }
+
+  var PAD = {top:24, right:20, bottom:44, left:70};
+  var gW = W - PAD.left - PAD.right;
+  var gH = H - PAD.top - PAD.bottom;
+
+  var vals = points.map(function(p){ return p.cum; });
+  var minV = Math.min.apply(null, vals);
+  var maxV = Math.max.apply(null, vals);
+  var range = maxV - minV || 1;
+  minV = minV - range * 0.08;
+  maxV = maxV + range * 0.08;
+  range = maxV - minV;
+
+  function xPos(i) { return PAD.left + (i / (points.length - 1 || 1)) * gW; }
+  function yPos(v) { return PAD.top + gH - ((v - minV) / range) * gH; }
+
+  // Sfondo
+  ctx.fillStyle = '#1a1f2e';
+  ctx.fillRect(0, 0, W, H);
+
+  // Griglia orizzontale
+  ctx.strokeStyle = 'rgba(255,255,255,0.07)';
+  ctx.lineWidth = 1;
+  var steps = 5;
+  for (var s = 0; s <= steps; s++) {
+    var v = minV + (range / steps) * s;
+    var y = yPos(v);
+    ctx.beginPath(); ctx.moveTo(PAD.left, y); ctx.lineTo(PAD.left + gW, y); ctx.stroke();
+    ctx.fillStyle = '#8899aa';
+    ctx.font = '11px Arial';
+    ctx.textAlign = 'right';
+    ctx.fillText((v >= 0 ? '+' : '') + '$' + Math.round(v), PAD.left - 8, y + 4);
+  }
+
+  // Linea zero
+  if (minV < 0 && maxV > 0) {
+    var y0 = yPos(0);
+    ctx.strokeStyle = 'rgba(255,255,255,0.25)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4,4]);
+    ctx.beginPath(); ctx.moveTo(PAD.left, y0); ctx.lineTo(PAD.left + gW, y0); ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  if (points.length > 1) {
+    // Area fill gradiente
+    var grad = ctx.createLinearGradient(0, PAD.top, 0, PAD.top + gH);
+    grad.addColorStop(0, 'rgba(74,222,128,0.35)');
+    grad.addColorStop(1, 'rgba(74,222,128,0.02)');
+    ctx.beginPath();
+    ctx.moveTo(xPos(0), yPos(0));
+    for (var i = 0; i < points.length; i++) ctx.lineTo(xPos(i), yPos(points[i].cum));
+    ctx.lineTo(xPos(points.length-1), yPos(minV < 0 ? minV : 0));
+    ctx.lineTo(xPos(0), yPos(minV < 0 ? minV : 0));
+    ctx.closePath();
+    ctx.fillStyle = grad;
+    ctx.fill();
+
+    // Linea principale
+    ctx.beginPath();
+    ctx.moveTo(xPos(0), yPos(0));
+    for (var i = 0; i < points.length; i++) ctx.lineTo(xPos(i), yPos(points[i].cum));
+    ctx.strokeStyle = '#4ade80';
+    ctx.lineWidth = 2.5;
+    ctx.lineJoin = 'round';
+    ctx.stroke();
+
+    // Punti
+    for (var i = 1; i < points.length; i++) {
+      ctx.beginPath();
+      ctx.arc(xPos(i), yPos(points[i].cum), 3.5, 0, Math.PI*2);
+      ctx.fillStyle = '#4ade80';
+      ctx.fill();
+      ctx.strokeStyle = '#1a1f2e';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+    }
+  }
+
+  // Etichette asse X (date)
+  ctx.fillStyle = '#8899aa';
+  ctx.font = '10px Arial';
+  ctx.textAlign = 'center';
+  var labelStep = Math.max(1, Math.floor(points.length / 6));
+  for (var i = 1; i < points.length; i += labelStep) {
+    var d = points[i].date ? points[i].date.slice(5) : '';
+    ctx.fillText(d, xPos(i), H - PAD.bottom + 18);
+  }
+
+  // Valore finale
+  if (points.length > 1) {
+    var last = points[points.length-1];
+    ctx.fillStyle = '#4ade80';
+    ctx.font = 'bold 13px Arial';
+    ctx.textAlign = 'left';
+    ctx.fillText((last.cum >= 0 ? '+' : '') + '$' + last.cum, xPos(points.length-1) - 30, yPos(last.cum) - 10);
+  }
+
+
   var byMonth = {};
   for (var i = 0; i < filtered.length; i++) {
     var m = filtered[i].data.slice(0,7);
