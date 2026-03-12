@@ -135,7 +135,12 @@ tr:nth-child(even) td { background: #f5f9ff; }
   </div>
 
   <div id="page-risultati" class="page">
-    <h2 style="color:#1F4E79;margin-bottom:20px">Risultati Pubblici</h2>
+    <h2 style="color:#1F4E79;margin-bottom:16px">Risultati Pubblici</h2>
+    <div style="margin-bottom:16px">
+      <button onclick="setAnno(0,this)" id="btn-tutti" style="padding:7px 18px;border-radius:20px;border:none;cursor:pointer;font-weight:700;font-size:13px;background:#1F4E79;color:white;margin-right:6px">Tutti</button>
+      <button onclick="setAnno(2025,this)" id="btn-2025" style="padding:7px 18px;border-radius:20px;border:2px solid #1F4E79;cursor:pointer;font-weight:700;font-size:13px;background:white;color:#1F4E79;margin-right:6px">2025</button>
+      <button onclick="setAnno(2026,this)" id="btn-2026" style="padding:7px 18px;border-radius:20px;border:2px solid #1F4E79;cursor:pointer;font-weight:700;font-size:13px;background:white;color:#1F4E79">2026</button>
+    </div>
     <div class="dark-box">
       <div class="dark-title">Stats Reali <span class="badge-date">1 Gen 2026 - Oggi</span></div>
       <div class="stats-grid">
@@ -257,6 +262,7 @@ function renderHome() {
   var byMonth = {};
   for (var i = 0; i < trades.length; i++) {
     var m = trades[i].data.slice(0,7);
+    if (annoFiltro !== 0 && trades[i].data.slice(0,4) !== String(annoFiltro)) continue;
     byMonth[m] = (byMonth[m] || 0) + trades[i].risultato;
   }
   var vals = [];
@@ -342,6 +348,23 @@ function deleteTrade(id) {
   }
   trades = newList;
   renderDiary();
+}
+
+var annoFiltro = 0;
+
+function setAnno(anno, btn) {
+  annoFiltro = anno;
+  var ids = ["btn-tutti","btn-2025","btn-2026"];
+  for (var i = 0; i < ids.length; i++) {
+    var b = document.getElementById(ids[i]);
+    b.style.background = "white";
+    b.style.color = "#1F4E79";
+    b.style.border = "2px solid #1F4E79";
+  }
+  btn.style.background = "#1F4E79";
+  btn.style.color = "white";
+  btn.style.border = "none";
+  renderChart();
 }
 
 function renderChart() {
