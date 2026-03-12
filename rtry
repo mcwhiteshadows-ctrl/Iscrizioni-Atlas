@@ -110,47 +110,35 @@ tr:nth-child(even) td { background: #f5f9ff; }
   </div>
 
   <div id="page-diario" class="page">
-    <div class="diary-layout">
-      <div class="diary-main">
-        <h2 style="color:#1F4E79;margin-bottom:16px">Diario di Trading</h2>
-        <div>
-          <button class="pill active" onclick="setFilter('tutti',this)">Tutti</button>
-          <button class="pill" onclick="setFilter('positivi',this)">Positivi</button>
-          <button class="pill" onclick="setFilter('negativi',this)">Negativi</button>
-        </div>
-        <table>
-          <thead>
-            <tr>
-              <th onclick="sortBy('data')">Data <span id="sort-data">-</span></th>
-              <th>Strumento</th>
-              <th onclick="sortBy('risultato')">Risultato <span id="sort-ris">-</span></th>
-              <th>Note</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody id="diary-body"></tbody>
-        </table>
-        <div id="diary-empty" style="text-align:center;padding:30px;color:#aaa;display:none">Nessuna operazione trovata.</div>
+    <div class="diary-main">
+      <h2 style="color:#1F4E79;margin-bottom:16px">Diario di Trading</h2>
+      <div style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:16px">
+        <button class="pill active" onclick="setFilter('tutti',this)">Tutti</button>
+        <button class="pill" onclick="setFilter('positivi',this)">Positivi</button>
+        <button class="pill" onclick="setFilter('negativi',this)">Negativi</button>
+        <div style="width:1px;height:28px;background:#ccc;margin:0 4px"></div>
+        <label style="font-size:12px;font-weight:600;color:#555">Dal</label>
+        <input type="date" id="date-from" style="padding:6px 8px;border:1px solid #ccc;border-radius:6px;font-size:12px">
+        <label style="font-size:12px;font-weight:600;color:#555">Al</label>
+        <input type="date" id="date-to" style="padding:6px 8px;border:1px solid #ccc;border-radius:6px;font-size:12px">
+        <button onclick="renderDiary()" style="padding:6px 16px;background:#2E75B6;color:white;border:none;border-radius:6px;cursor:pointer;font-weight:700;font-size:12px">Cerca</button>
+        <button onclick="cancellaFiltri()" style="padding:6px 16px;background:#888;color:white;border:none;border-radius:6px;cursor:pointer;font-weight:700;font-size:12px">Cancella</button>
+        <span style="margin-left:8px;font-size:13px;color:#555">Trade: <strong id="count-trades">0</strong></span>
+        <span style="font-size:13px;color:#555">Totale: <strong id="total-period">0$</strong></span>
       </div>
-      <div class="filter-panel">
-        <div class="filter-box">
-          <h4>Cerca trade</h4>
-          <label>Dal</label>
-          <input type="date" id="date-from">
-          <label>Al</label>
-          <input type="date" id="date-to">
-          <label>Strumento</label>
-          <input type="text" id="search-strumento" placeholder="es. QQQ, AMD..." style="width:100%;padding:7px 8px;border:1px solid #ccc;border-radius:6px;font-size:12px;margin-bottom:10px">
-          <button onclick="cercaTrade()" style="width:100%;padding:9px;background:#2E75B6;color:white;border:none;border-radius:6px;cursor:pointer;font-weight:700;font-size:13px;margin-bottom:8px">Cerca</button>
-          <button onclick="cancellaFiltri()" style="width:100%;padding:9px;background:#888;color:white;border:none;border-radius:6px;cursor:pointer;font-weight:700;font-size:13px">Cancella</button>
-          <div class="mini-stat">
-            <div class="ml">Trade trovati</div>
-            <div class="mv" id="count-trades">0</div>
-            <div class="ml" style="margin-top:8px">Totale periodo</div>
-            <div class="mv" id="total-period" style="font-size:18px">0$</div>
-          </div>
-        </div>
-      </div>
+      <table>
+        <thead>
+          <tr>
+            <th onclick="sortBy('data')">Data <span id="sort-data">-</span></th>
+            <th>Strumento</th>
+            <th onclick="sortBy('risultato')">Risultato <span id="sort-ris">-</span></th>
+            <th>Note</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="diary-body"></tbody>
+      </table>
+      <div id="diary-empty" style="text-align:center;padding:30px;color:#aaa;display:none">Nessuna operazione trovata.</div>
     </div>
   </div>
 
