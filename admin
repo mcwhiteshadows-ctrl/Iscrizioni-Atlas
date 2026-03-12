@@ -254,27 +254,27 @@ function showPage(p, btn) {
   if (p === "home") // ADMIN
 var clickCount = 0;
 var clickTimer = null;
-var statsData = {
+
+document.getElementById("admin-trigger").onclick = function() {
+  clickCount++;
+  if (clickTimer) clearTimeout(clickTimer);
+  clickTimer = setTimeout(function(){ clickCount = 0; }, 3000);
+  if (clickCount >= 5) {
+    clickCount = 0;
+    clearTimeout(clickTimer);
+    var m = document.getElementById("pwd-modal");
+    m.style.display = "flex";
+    document.getElementById("pwd-input").value = "";
+    document.getElementById("pwd-err").textContent = "";
+    document.getElementById("pwd-input").focus();
+  }
+};
   totale: "$853.00", maxwin: "$389.00", maxloss: "-$89.00",
   media: "$106.63", vincenti: "7 (87.5%)", perdenti: "1 (12.5%)",
   totaltrade: "8", pf: "10.58", std: "$140.57"
 };
 
-document.getElementById("admin-trigger").addEventListener("click", function() {
-  clickCount++;
-  if (clickTimer) clearTimeout(clickTimer);
-  if (clickCount >= 5) {
-    clickCount = 0;
-    document.getElementById("pwd-modal").style.display = "flex";
-    document.getElementById("pwd-input").value = "";
-    document.getElementById("pwd-err").textContent = "";
-    setTimeout(function(){ document.getElementById("pwd-input").focus(); }, 100);
-  } else {
-    clickTimer = setTimeout(function(){ clickCount = 0; }, 2000);
-  }
-});
-
-function checkPwd() {
+var statsData = {
   if (document.getElementById("pwd-input").value === "atlas2026") {
     document.getElementById("pwd-modal").style.display = "none";
     openAdmin();
