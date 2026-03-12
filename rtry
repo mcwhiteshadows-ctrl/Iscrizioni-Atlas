@@ -7,13 +7,15 @@
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: Arial, sans-serif; background: #f0f4f8; color: #333; }
-nav { background: #1F4E79; display: flex; }
+nav { background: #1F4E79; display: flex; align-items: center; }
+nav img { height: 40px; width: auto; padding: 0 12px; border-right: 1px solid rgba(255,255,255,0.2); }
 nav button { flex: 1; padding: 14px; border: none; background: none; color: white; font-weight: 700; font-size: 13px; cursor: pointer; }
 nav button.active, nav button:hover { background: #2E75B6; }
-.container { max-width: 900px; margin: 24px auto; padding: 0 16px; }
+.container { max-width: 960px; margin: 24px auto; padding: 0 16px; }
 .page { display: none; }
 .page.active { display: block; }
-.hero { background: #1F4E79; color: white; border-radius: 10px; padding: 24px; margin-bottom: 20px; }
+.hero { background: #1F4E79; color: white; border-radius: 10px; padding: 24px; margin-bottom: 20px; display: flex; align-items: center; gap: 24px; }
+.hero img { height: 80px; width: auto; flex-shrink: 0; }
 .hero h2 { font-size: 22px; margin-bottom: 8px; }
 .hero p { font-style: italic; opacity: .85; font-size: 14px; }
 .kpi-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
@@ -24,18 +26,14 @@ nav button.active, nav button:hover { background: #2E75B6; }
 .red { color: #CC0000 !important; }
 .warning { background: #fff8e1; border: 1px solid #f0c040; border-radius: 8px; padding: 12px 16px; font-size: 13px; margin-top: 16px; }
 .info-box { background: #EBF3FB; border-left: 4px solid #2E75B6; border-radius: 6px; padding: 12px 16px; font-size: 13px; margin-top: 12px; }
-.diary-layout { display: flex; gap: 20px; }
-.diary-main { flex: 1; min-width: 0; }
-.filter-panel { width: 190px; flex-shrink: 0; }
-.filter-box { background: #EBF3FB; border-radius: 10px; padding: 16px; border: 1px solid #c5d9ee; }
-.filter-box h4 { color: #1F4E79; font-size: 14px; margin-bottom: 14px; }
-.filter-box label { font-size: 11px; font-weight: 600; color: #555; display: block; margin-bottom: 4px; }
-.filter-box input[type=date] { width: 100%; padding: 7px 8px; border: 1px solid #ccc; border-radius: 6px; font-size: 12px; margin-bottom: 10px; }
-.mini-stat { margin-top: 14px; border-top: 1px solid #c5d9ee; padding-top: 12px; }
-.mini-stat .ml { font-size: 11px; color: #555; margin-bottom: 4px; }
-.mini-stat .mv { font-size: 20px; font-weight: 700; color: #1F4E79; }
-.pill { padding: 6px 14px; border-radius: 20px; border: none; cursor: pointer; font-weight: 600; font-size: 12px; background: #e0e0e0; color: #333; margin-right: 6px; margin-bottom: 12px; }
+.toolbar { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+.pill { padding: 6px 14px; border-radius: 20px; border: none; cursor: pointer; font-weight: 600; font-size: 12px; background: #e0e0e0; color: #333; }
 .pill.active { background: #1F4E79; color: white; }
+.sep { width: 1px; height: 28px; background: #ccc; margin: 0 4px; }
+.toolbar label { font-size: 12px; font-weight: 600; color: #555; }
+.toolbar input[type=date] { padding: 6px 8px; border: 1px solid #ccc; border-radius: 6px; font-size: 12px; }
+.btn-cerca { padding: 6px 16px; background: #2E75B6; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 700; font-size: 12px; }
+.btn-cancella { padding: 6px 16px; background: #888; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 700; font-size: 12px; }
 table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; }
 thead tr { background: #1F4E79; color: white; }
 th { padding: 10px 12px; text-align: left; font-size: 13px; cursor: pointer; }
@@ -45,7 +43,6 @@ tr:nth-child(even) td { background: #f5f9ff; }
 .pos { color: #1a7a1a; font-weight: 700; }
 .neg { color: #CC0000; font-weight: 700; }
 .del-btn { background: none; border: none; cursor: pointer; color: #bbb; font-size: 14px; }
-.btn-reset { width: 100%; padding: 8px; background: #1F4E79; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 12px; }
 .dark-box { background: #1a1f2e; border-radius: 12px; padding: 20px; margin-bottom: 20px; }
 .dark-title { color: white; font-weight: 700; font-size: 15px; margin-bottom: 14px; }
 .badge-date { background: #2E75B6; color: white; font-size: 11px; border-radius: 4px; padding: 2px 8px; margin-left: 8px; }
@@ -85,9 +82,7 @@ tr:nth-child(even) td { background: #f5f9ff; }
 <body>
 
 <nav>
-  <div style="display:flex;align-items:center;padding:0 12px;flex-shrink:0;border-right:1px solid rgba(255,255,255,0.2)">
-    <img src="logo.png" alt="Atlas" style="height:40px;width:auto;">
-  </div>
+  <img src="https://mcwhiteshadows-ctrl.github.io/Iscrizioni-Atlas/logo.png" alt="Atlas">
   <button class="active" onclick="showPage('home',this)">Home</button>
   <button onclick="showPage('diario',this)">Diario</button>
   <button onclick="showPage('risultati',this)">Risultati</button>
@@ -97,8 +92,8 @@ tr:nth-child(even) td { background: #f5f9ff; }
 <div class="container">
 
   <div id="page-home" class="page active">
-    <div class="hero" style="display:flex;align-items:center;gap:24px">
-      <img src="logo.png" alt="Atlas" style="height:90px;width:auto;flex-shrink:0;">
+    <div class="hero">
+      <img src="https://mcwhiteshadows-ctrl.github.io/Iscrizioni-Atlas/logo.png" alt="Atlas">
       <div>
         <h2>Micro Profits</h2>
         <p>Non ti prometto di diventare ricco. Ti mostro come guadagnare il caffe o la bolletta della luce ogni mese con disciplina e dati veri.</p>
@@ -110,40 +105,42 @@ tr:nth-child(even) td { background: #f5f9ff; }
   </div>
 
   <div id="page-diario" class="page">
-    <div class="diary-main">
-      <h2 style="color:#1F4E79;margin-bottom:16px">Diario di Trading</h2>
-      <div style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:16px">
-        <button class="pill active" onclick="setFilter('tutti',this)">Tutti</button>
-        <button class="pill" onclick="setFilter('positivi',this)">Positivi</button>
-        <button class="pill" onclick="setFilter('negativi',this)">Negativi</button>
-        <div style="width:1px;height:28px;background:#ccc;margin:0 4px"></div>
-        <label style="font-size:12px;font-weight:600;color:#555">Dal</label>
-        <input type="date" id="date-from" style="padding:6px 8px;border:1px solid #ccc;border-radius:6px;font-size:12px">
-        <label style="font-size:12px;font-weight:600;color:#555">Al</label>
-        <input type="date" id="date-to" style="padding:6px 8px;border:1px solid #ccc;border-radius:6px;font-size:12px">
-        <button onclick="renderDiary()" style="padding:6px 16px;background:#2E75B6;color:white;border:none;border-radius:6px;cursor:pointer;font-weight:700;font-size:12px">Cerca</button>
-        <button onclick="cancellaFiltri()" style="padding:6px 16px;background:#888;color:white;border:none;border-radius:6px;cursor:pointer;font-weight:700;font-size:12px">Cancella</button>
-        <span style="margin-left:8px;font-size:13px;color:#555">Trade: <strong id="count-trades">0</strong></span>
-        <span style="font-size:13px;color:#555">Totale: <strong id="total-period">0$</strong></span>
-      </div>
-      <table>
-        <thead>
-          <tr>
-            <th onclick="sortBy('data')">Data <span id="sort-data">-</span></th>
-            <th>Strumento</th>
-            <th onclick="sortBy('risultato')">Risultato <span id="sort-ris">-</span></th>
-            <th>Note</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody id="diary-body"></tbody>
-      </table>
-      <div id="diary-empty" style="text-align:center;padding:30px;color:#aaa;display:none">Nessuna operazione trovata.</div>
+    <h2 style="color:#1F4E79;margin-bottom:16px">Diario di Trading</h2>
+    <div class="toolbar">
+      <button class="pill active" onclick="setFilter('tutti',this)">Tutti</button>
+      <button class="pill" onclick="setFilter('positivi',this)">Positivi</button>
+      <button class="pill" onclick="setFilter('negativi',this)">Negativi</button>
+      <div class="sep"></div>
+      <label>Dal</label>
+      <input type="date" id="date-from">
+      <label>Al</label>
+      <input type="date" id="date-to">
+      <button class="btn-cerca" onclick="renderDiary()">Cerca</button>
+      <button class="btn-cancella" onclick="cancellaFiltri()">Cancella</button>
+      <span style="font-size:13px;color:#555;margin-left:4px">Trade: <strong id="count-trades">0</strong> &nbsp; Totale: <strong id="total-period">0$</strong></span>
     </div>
+    <table>
+      <thead>
+        <tr>
+          <th onclick="sortBy('data')">Data <span id="sort-data">-</span></th>
+          <th>Strumento</th>
+          <th onclick="sortBy('risultato')">Risultato <span id="sort-ris">-</span></th>
+          <th>Note</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="diary-body"></tbody>
+    </table>
+    <div id="diary-empty" style="text-align:center;padding:30px;color:#aaa;display:none">Nessuna operazione trovata.</div>
   </div>
 
   <div id="page-risultati" class="page">
-    <h2 style="color:#1F4E79;margin-bottom:20px">Risultati Pubblici</h2>
+    <h2 style="color:#1F4E79;margin-bottom:16px">Risultati Pubblici</h2>
+    <div style="margin-bottom:16px">
+      <button onclick="setAnno(0,this)" id="btn-tutti" style="padding:7px 18px;border-radius:20px;border:none;cursor:pointer;font-weight:700;font-size:13px;background:#1F4E79;color:white;margin-right:6px">Tutti</button>
+      <button onclick="setAnno(2025,this)" id="btn-2025" style="padding:7px 18px;border-radius:20px;border:2px solid #1F4E79;cursor:pointer;font-weight:700;font-size:13px;background:white;color:#1F4E79;margin-right:6px">2025</button>
+      <button onclick="setAnno(2026,this)" id="btn-2026" style="padding:7px 18px;border-radius:20px;border:2px solid #1F4E79;cursor:pointer;font-weight:700;font-size:13px;background:white;color:#1F4E79">2026</button>
+    </div>
     <div class="dark-box">
       <div class="dark-title">Stats Reali <span class="badge-date">1 Gen 2026 - Oggi</span></div>
       <div class="stats-grid">
@@ -265,6 +262,7 @@ function renderHome() {
   var byMonth = {};
   for (var i = 0; i < trades.length; i++) {
     var m = trades[i].data.slice(0,7);
+    if (annoFiltro !== 0 && trades[i].data.slice(0,4) !== String(annoFiltro)) continue;
     byMonth[m] = (byMonth[m] || 0) + trades[i].risultato;
   }
   var vals = [];
@@ -300,25 +298,15 @@ function sortBy(key) {
   renderDiary();
 }
 
-function cercaTrade() {
-  renderDiary();
-}
-
 function cancellaFiltri() {
   document.getElementById("date-from").value = "";
   document.getElementById("date-to").value = "";
-  document.getElementById("search-strumento").value = "";
   renderDiary();
-}
-
-function resetFilter() {
-  cancellaFiltri();
 }
 
 function renderDiary() {
   var from = document.getElementById("date-from").value;
   var to   = document.getElementById("date-to").value;
-  var strumento = document.getElementById("search-strumento").value.trim().toUpperCase();
   var list = [];
   for (var i = 0; i < trades.length; i++) {
     var t = trades[i];
@@ -326,7 +314,6 @@ function renderDiary() {
     if (filterType === "negativi" && t.risultato >= 0) continue;
     if (from !== "" && t.data < from) continue;
     if (to   !== "" && t.data > to)   continue;
-    if (strumento !== "" && t.strumento.toUpperCase().indexOf(strumento) === -1) continue;
     list.push(t);
   }
   list.sort(function(a, b) {
@@ -351,7 +338,7 @@ function renderDiary() {
   for (var i = 0; i < list.length; i++) tot += list[i].risultato;
   var el = document.getElementById("total-period");
   el.textContent = (tot >= 0 ? "+" : "") + tot + "$";
-  el.className = "mv " + (tot >= 0 ? "pos" : "neg");
+  el.style.color = tot >= 0 ? "#1a7a1a" : "#CC0000";
 }
 
 function deleteTrade(id) {
@@ -361,6 +348,23 @@ function deleteTrade(id) {
   }
   trades = newList;
   renderDiary();
+}
+
+var annoFiltro = 0;
+
+function setAnno(anno, btn) {
+  annoFiltro = anno;
+  var ids = ["btn-tutti","btn-2025","btn-2026"];
+  for (var i = 0; i < ids.length; i++) {
+    var b = document.getElementById(ids[i]);
+    b.style.background = "white";
+    b.style.color = "#1F4E79";
+    b.style.border = "2px solid #1F4E79";
+  }
+  btn.style.background = "#1F4E79";
+  btn.style.color = "white";
+  btn.style.border = "none";
+  renderChart();
 }
 
 function renderChart() {
