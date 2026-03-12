@@ -85,6 +85,9 @@ tr:nth-child(even) td { background: #f5f9ff; }
 <body>
 
 <nav>
+  <div style="display:flex;align-items:center;padding:0 12px;flex-shrink:0;border-right:1px solid rgba(255,255,255,0.2)">
+    <img src="logo.png" alt="Atlas" style="height:40px;width:auto;">
+  </div>
   <button class="active" onclick="showPage('home',this)">Home</button>
   <button onclick="showPage('diario',this)">Diario</button>
   <button onclick="showPage('risultati',this)">Risultati</button>
@@ -96,10 +99,11 @@ tr:nth-child(even) td { background: #f5f9ff; }
   <div id="page-home" class="page active">
     <div class="hero">
       <h2>Micro Profits</h2>
-      <p>Non ti prometto di diventare ricco. Ti aiuto ad arrotondare, pagare il caffe o la bolletta della luce ogni mese con disciplina e dati veri.</p>
+      <p>Non ti prometto di diventare ricco. Ti mostro come guadagnare il caffe o la bolletta della luce ogni mese con disciplina e dati veri.</p>
     </div>
     <div class="kpi-row" id="home-kpis"></div>
-    <div class="warning">Avviso legale: Questo e un progetto educativo. Non gestiamo fondi altrui ne offriamo consulenza personalizzata.</div>
+    <div class="warning">Avviso legale: Questo e un progetto educativo. Non gestiamo fondi altrui ne offriamo consulenza personalizzata. Verifica sempre le normative CONSOB prima di operare.</div>
+    <div class="info-box">Obiettivo del mese: 50-100 dollari netti con operazioni disciplinate.</div>
   </div>
 
   <div id="page-diario" class="page">
