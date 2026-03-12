@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Atlas shield</title>
+<title>Micro Profits</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: Arial, sans-serif; background: #f0f4f8; color: #333; }
@@ -100,13 +100,13 @@ tr:nth-child(even) td { background: #f5f9ff; }
     <div class="hero" style="display:flex;align-items:center;gap:24px">
       <img src="logo.png" alt="Atlas" style="height:90px;width:auto;flex-shrink:0;">
       <div>
-        <h2>Atlas shield</h2>
-        <p>Non ti prometto di diventare ricco. Ti aiuto a guadagnare i soldi per il caffe o la bolletta della luce ogni mese con disciplina e dati veri.</p>
+        <h2>Micro Profits</h2>
+        <p>Non ti prometto di diventare ricco. Ti mostro come guadagnare il caffe o la bolletta della luce ogni mese con disciplina e dati veri.</p>
       </div>
     </div>
     <div class="kpi-row" id="home-kpis"></div>
     <div class="warning">Avviso legale: Questo e un progetto educativo. Non gestiamo fondi altrui ne offriamo consulenza personalizzata. Verifica sempre le normative CONSOB prima di operare.</div>
-    <div class="info-box">Il nostro obiettivo in Atlas e' fare piccoli guadagni ma frequenti.</div>
+    <div class="info-box">Obiettivo del mese: 50-100 dollari netti con operazioni disciplinate.</div>
   </div>
 
   <div id="page-diario" class="page">
@@ -178,7 +178,7 @@ tr:nth-child(even) td { background: #f5f9ff; }
     <div id="comm-form-area">
       <div class="comm-hero">
         <h2>Aderisci alla Community</h2>
-        <p>Compila il modulo per unirti a Atlas shield. Ti contatteremo per completare l iscrizione.</p>
+        <p>Compila il modulo per unirti a Micro Profits. Ti contatteremo per completare l iscrizione.</p>
       </div>
       <div class="form-grid2">
         <div class="form-group">
@@ -235,14 +235,20 @@ tr:nth-child(even) td { background: #f5f9ff; }
 var SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyz8HzCPqk2DpLkoyLnWe9yYLOfpvWSNJIFESMq2pkB474RFU5sk2yxu0K42OynYuPg/exec";
 
 var trades = [
-  { id:1, data:"2026-01-06", strumento:"QQQ", risultato:72,  note:"" },
-  { id:2, data:"2026-01-15", strumento:"QQQ", risultato:118, note:"" },
-  { id:3, data:"2026-01-15", strumento:"QQQ", risultato:204, note:"" },
-  { id:4, data:"2026-01-21", strumento:"QQQ", risultato:-89, note:"" },
-  { id:5, data:"2026-02-03", strumento:"QQQ", risultato:389, note:"" },
-  { id:6, data:"2026-02-03", strumento:"QQQ", risultato:68,  note:"" },
-  { id:7, data:"2026-02-03", strumento:"QQQ", risultato:29,  note:"" },
-  { id:8, data:"2026-02-03", strumento:"QQQ", risultato:62,  note:"" }
+  { id:1,  data:"2025-12-02", strumento:"QQQ", risultato:243, note:"" },
+  { id:2,  data:"2025-12-03", strumento:"QQQ", risultato:44,  note:"" },
+  { id:3,  data:"2025-12-11", strumento:"QQQ", risultato:7,   note:"" },
+  { id:4,  data:"2025-12-15", strumento:"AMD", risultato:48,  note:"" },
+  { id:5,  data:"2025-12-16", strumento:"QQQ", risultato:75,  note:"" },
+  { id:6,  data:"2025-12-16", strumento:"QQQ", risultato:321, note:"" },
+  { id:7,  data:"2026-01-06", strumento:"QQQ", risultato:72,  note:"" },
+  { id:8,  data:"2026-01-15", strumento:"QQQ", risultato:118, note:"" },
+  { id:9,  data:"2026-01-15", strumento:"QQQ", risultato:204, note:"" },
+  { id:10, data:"2026-01-21", strumento:"QQQ", risultato:-89, note:"" },
+  { id:11, data:"2026-02-03", strumento:"QQQ", risultato:389, note:"" },
+  { id:12, data:"2026-02-03", strumento:"QQQ", risultato:68,  note:"" },
+  { id:13, data:"2026-02-03", strumento:"QQQ", risultato:29,  note:"" },
+  { id:14, data:"2026-02-03", strumento:"QQQ", risultato:62,  note:"" }
 ];
 
 var filterType = "tutti";
@@ -368,7 +374,7 @@ function renderChart() {
   for (var i = 0; i < months.length; i++) {
     if (Math.abs(months[i][1]) > maxAbs) maxAbs = Math.abs(months[i][1]);
   }
-  var names = {"2026-01":"Gennaio 2026","2026-02":"Febbraio 2026","2026-03":"Marzo 2026"};
+  var names = {"2025-12":"Dicembre 2025","2026-01":"Gennaio 2026","2026-02":"Febbraio 2026","2026-03":"Marzo 2026"};
   var html = "";
   for (var i = 0; i < months.length; i++) {
     var m = months[i][0];
