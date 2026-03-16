@@ -134,7 +134,7 @@ tr:nth-child(even) td { background: #f5f9ff; }
       <img src="https://mcwhiteshadows-ctrl.github.io/Iscrizioni-Atlas/logo.png" alt="Atlas">
       <div>
         <h2>Atlas shield</h2>
-        <p>Con il nostro progetto stiamo dimostrando che si puo'avere un ritorno costante dai mercati finanziari combinando AI e humans.</p>
+        <p>Con il nostro progetto stiamo dimostrando che si puo'avere un ritorno dai mercati finanziari combinando AI e umano.</p>
       </div>
     </div>
     <div class="kpi-row" id="home-kpis"></div>
@@ -781,45 +781,43 @@ function adminAddTrade() {
 /* ===== COUNTDOWN ===== */
 var countdownInterval = null;
 
-function loadCountdown() {
-  var data = localStorage.getItem('atlas_countdown');
-  if (!data) return;
-  try { return JSON.parse(data); } catch(e) { return null; }
-}
-
 function startCountdown() {
-  var cd = loadCountdown();
-  var box = document.getElementById('countdown-box');
-  if (!cd || !cd.datetime) { box.classList.add('hidden'); return; }
-  box.classList.remove('hidden');
-  document.getElementById('cd-title-text').textContent = cd.title || '';
-  if (countdownInterval) clearInterval(countdownInterval);
-  function tick() {
-    var now = new Date().getTime();
-    var target = new Date(cd.datetime).getTime();
-    var diff = target - now;
-    var expired = document.getElementById('cd-expired');
-    var units = document.querySelector('.cd-units');
-    if (diff <= 0) {
-      expired.style.display = 'block';
-      units.style.display = 'none';
-      clearInterval(countdownInterval);
-      return;
-    }
-    expired.style.display = 'none';
-    units.style.display = 'flex';
-    var giorni  = Math.floor(diff / (1000*60*60*24));
-    var ore     = Math.floor((diff % (1000*60*60*24)) / (1000*60*60));
-    var minuti  = Math.floor((diff % (1000*60*60)) / (1000*60));
-    var secondi = Math.floor((diff % (1000*60)) / 1000);
-    function pad(n){ return n < 10 ? '0'+n : ''+n; }
-    document.getElementById('cd-giorni').textContent  = pad(giorni);
-    document.getElementById('cd-ore').textContent     = pad(ore);
-    document.getElementById('cd-minuti').textContent  = pad(minuti);
-    document.getElementById('cd-secondi').textContent = pad(secondi);
-  }
-  tick();
-  countdownInterval = setInterval(tick, 1000);
+  fetch(SCRIPT_URL + '?action=get_countdown')
+    .then(function(r){ return r.json(); })
+    .then(function(cd) {
+      var box = document.getElementById('countdown-box');
+      if (!cd || !cd.datetime) { box.classList.add('hidden'); return; }
+      box.classList.remove('hidden');
+      document.getElementById('cd-title-text').textContent = cd.title || '';
+      if (countdownInterval) clearInterval(countdownInterval);
+      function tick() {
+        var now = new Date().getTime();
+        var target = new Date(cd.datetime).getTime();
+        var diff = target - now;
+        var expired = document.getElementById('cd-expired');
+        var units = document.querySelector('.cd-units');
+        if (diff <= 0) {
+          expired.style.display = 'block';
+          units.style.display = 'none';
+          clearInterval(countdownInterval);
+          return;
+        }
+        expired.style.display = 'none';
+        units.style.display = 'flex';
+        var giorni  = Math.floor(diff / (1000*60*60*24));
+        var ore     = Math.floor((diff % (1000*60*60*24)) / (1000*60*60));
+        var minuti  = Math.floor((diff % (1000*60*60)) / (1000*60));
+        var secondi = Math.floor((diff % (1000*60)) / 1000);
+        function pad(n){ return n < 10 ? '0'+n : ''+n; }
+        document.getElementById('cd-giorni').textContent  = pad(giorni);
+        document.getElementById('cd-ore').textContent     = pad(ore);
+        document.getElementById('cd-minuti').textContent  = pad(minuti);
+        document.getElementById('cd-secondi').textContent = pad(secondi);
+      }
+      tick();
+      countdownInterval = setInterval(tick, 1000);
+    })
+    .catch(function(){ document.getElementById('countdown-box').classList.add('hidden'); });
 }
 
 function adminSaveCountdown() {
@@ -827,23 +825,42 @@ function adminSaveCountdown() {
   var dt    = document.getElementById('adm-cd-datetime').value;
   var msg   = document.getElementById('adm-cd-msg');
   if (!dt) { msg.style.color='#CC0000'; msg.textContent='Inserisci una data e orario.'; return; }
-  localStorage.setItem('atlas_countdown', JSON.stringify({ title: title, datetime: dt }));
-  msg.style.color = '#1a7a1a';
-  msg.textContent = '✔ Salvato!';
-  setTimeout(function(){ msg.textContent=''; }, 2500);
-  startCountdown();
+  msg.style.color='#888'; msg.textContent='Salvataggio...';
+  fetch(SCRIPT_URL + '?action=set_countdown&datetime=' + encodeURIComponent(dt) + '&title=' + encodeURIComponent(title))
+    .then(function(r){ return r.text(); })
+    .then(function(res) {
+      msg.style.color = '#1a7a1a';
+      msg.textContent = '✔ Salvato! Visibile su tutti i dispositivi.';
+      setTimeout(function(){ msg.textContent=''; }, 3000);
+      startCountdown();
+    })
+    .catch(function(){ msg.style.color='#CC0000'; msg.textContent='Errore di connessione.'; });
 }
 
 function adminClearCountdown() {
-  localStorage.removeItem('atlas_countdown');
-  document.getElementById('adm-cd-title').value = '';
-  document.getElementById('adm-cd-datetime').value = '';
   var msg = document.getElementById('adm-cd-msg');
-  msg.style.color = '#888';
-  msg.textContent = 'Countdown rimosso.';
-  setTimeout(function(){ msg.textContent=''; }, 2000);
-  document.getElementById('countdown-box').classList.add('hidden');
-  if (countdownInterval) clearInterval(countdownInterval);
+  msg.style.color='#888'; msg.textContent='Rimozione...';
+  fetch(SCRIPT_URL + '?action=set_countdown&datetime=&title=')
+    .then(function(){
+      document.getElementById('adm-cd-title').value = '';
+      document.getElementById('adm-cd-datetime').value = '';
+      msg.style.color='#888'; msg.textContent='Countdown rimosso.';
+      setTimeout(function(){ msg.textContent=''; }, 2000);
+      document.getElementById('countdown-box').classList.add('hidden');
+      if (countdownInterval) clearInterval(countdownInterval);
+    })
+    .catch(function(){ msg.style.color='#CC0000'; msg.textContent='Errore di connessione.'; });
+}
+
+function loadCountdownInAdmin() {
+  fetch(SCRIPT_URL + '?action=get_countdown')
+    .then(function(r){ return r.json(); })
+    .then(function(cd) {
+      if (!cd) return;
+      if (cd.title)    document.getElementById('adm-cd-title').value = cd.title;
+      if (cd.datetime) document.getElementById('adm-cd-datetime').value = cd.datetime;
+    })
+    .catch(function(){});
 }
 
 function openAdmin() {
@@ -860,13 +877,6 @@ function openAdmin() {
     loadCountdownInAdmin();
   }
   setTimeout(function(){ document.getElementById('admin-pw-input').focus(); }, 100);
-}
-
-function loadCountdownInAdmin() {
-  var cd = loadCountdown();
-  if (!cd) return;
-  if (cd.title)    document.getElementById('adm-cd-title').value = cd.title;
-  if (cd.datetime) document.getElementById('adm-cd-datetime').value = cd.datetime;
 }
 
 renderHome();
