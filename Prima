@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>Atlas shield</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -101,6 +104,17 @@ tr:nth-child(even) td { background: #f5f9ff; }
 #adm-add button { padding:7px 14px; background:#2E75B6; color:white; border:none; border-radius:5px; cursor:pointer; font-weight:700; font-size:12px; white-space:nowrap; }
 #admin-close { position:absolute; top:12px; right:14px; background:none; border:none; font-size:24px; cursor:pointer; color:#888; line-height:1; }
 #secret-zone { position:fixed; bottom:0; right:0; width:50px; height:50px; z-index:999; }
+
+/* Countdown */
+#countdown-box { background: linear-gradient(135deg, #1a1f2e 0%, #1F4E79 100%); border-radius: 12px; padding: 22px 24px; margin-bottom: 20px; text-align: center; }
+#countdown-box .cd-label { color: rgba(255,255,255,0.75); font-size: 12px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 14px; }
+#countdown-box .cd-title { color: white; font-size: 15px; font-weight: 700; margin-bottom: 16px; }
+.cd-units { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
+.cd-unit { background: rgba(255,255,255,0.1); border-radius: 10px; padding: 12px 16px; min-width: 70px; }
+.cd-num { font-size: 32px; font-weight: 700; color: white; line-height: 1; display: block; }
+.cd-name { font-size: 11px; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; display: block; }
+.cd-expired { color: #4ade80; font-size: 18px; font-weight: 700; padding: 10px 0; }
+#countdown-box.hidden { display: none; }
 </style>
 </head>
 <body>
@@ -120,10 +134,23 @@ tr:nth-child(even) td { background: #f5f9ff; }
       <img src="https://mcwhiteshadows-ctrl.github.io/Iscrizioni-Atlas/logo.png" alt="Atlas">
       <div>
         <h2>Atlas shield</h2>
-        <p>Con il nostro progetto stiamo dimostrando che si puo'avere un ritorno dai mercati finanziari combinando AI e umano.</p>
+        <p>Con il nostro progetto stiamo dimostrando che si puo'avere un ritorno costante dai mercati finanziari combinando AI e humans.</p>
       </div>
     </div>
     <div class="kpi-row" id="home-kpis"></div>
+
+    <!-- Countdown -->
+    <div id="countdown-box" class="hidden">
+      <div class="cd-label">⏳ Prossimo evento</div>
+      <div class="cd-title" id="cd-title-text"></div>
+      <div class="cd-units">
+        <div class="cd-unit"><span class="cd-num" id="cd-giorni">00</span><span class="cd-name">Giorni</span></div>
+        <div class="cd-unit"><span class="cd-num" id="cd-ore">00</span><span class="cd-name">Ore</span></div>
+        <div class="cd-unit"><span class="cd-num" id="cd-minuti">00</span><span class="cd-name">Minuti</span></div>
+        <div class="cd-unit"><span class="cd-num" id="cd-secondi">00</span><span class="cd-name">Secondi</span></div>
+      </div>
+      <div class="cd-expired" id="cd-expired" style="display:none">🎉 Evento iniziato!</div>
+    </div>
     <div class="warning">Avviso legale: Questo e un progetto educativo. Non gestiamo fondi altrui ne offriamo consulenza personalizzata.</div>
     <div class="info-box">Stiamo sviluppando un ecosistema basato su algoritmi proprietari e disciplina operativa, accessibile a chiunque voglia supportarne la crescita con una libera donazione
 Il progetto avanza esclusivamente grazie alle donazioni spontanee della community: ogni contributo è un’erogazione liberale a fondo perduto che finanzia la nostra ricerca tecnologica, senza alcuna promessa di rendimento o finalità di investimento finanziario..</div>
@@ -675,21 +702,6 @@ function secretClick() {
   }
 }
 
-function openAdmin() {
-  document.getElementById('admin-overlay').classList.add('open');
-  document.getElementById('admin-pw-input').value = '';
-  document.getElementById('admin-pw-err').textContent = '';
-  if (!adminUnlocked) {
-    document.getElementById('admin-pw-area').style.display = 'flex';
-    document.getElementById('admin-main').style.display = 'none';
-  } else {
-    document.getElementById('admin-pw-area').style.display = 'none';
-    document.getElementById('admin-main').style.display = 'block';
-    renderAdminList();
-  }
-  setTimeout(function(){ document.getElementById('admin-pw-input').focus(); }, 100);
-}
-
 function closeAdmin() {
   document.getElementById('admin-overlay').classList.remove('open');
 }
@@ -701,6 +713,7 @@ function checkPw() {
     document.getElementById('admin-pw-area').style.display = 'none';
     document.getElementById('admin-main').style.display = 'block';
     renderAdminList();
+    loadCountdownInAdmin();
   } else {
     document.getElementById('admin-pw-err').textContent = 'Password errata.';
   }
@@ -765,9 +778,101 @@ function adminAddTrade() {
   renderHome(); renderDiary(); renderChart();
 }
 
+/* ===== COUNTDOWN ===== */
+var countdownInterval = null;
+
+function loadCountdown() {
+  var data = localStorage.getItem('atlas_countdown');
+  if (!data) return;
+  try { return JSON.parse(data); } catch(e) { return null; }
+}
+
+function startCountdown() {
+  var cd = loadCountdown();
+  var box = document.getElementById('countdown-box');
+  if (!cd || !cd.datetime) { box.classList.add('hidden'); return; }
+  box.classList.remove('hidden');
+  document.getElementById('cd-title-text').textContent = cd.title || '';
+  if (countdownInterval) clearInterval(countdownInterval);
+  function tick() {
+    var now = new Date().getTime();
+    var target = new Date(cd.datetime).getTime();
+    var diff = target - now;
+    var expired = document.getElementById('cd-expired');
+    var units = document.querySelector('.cd-units');
+    if (diff <= 0) {
+      expired.style.display = 'block';
+      units.style.display = 'none';
+      clearInterval(countdownInterval);
+      return;
+    }
+    expired.style.display = 'none';
+    units.style.display = 'flex';
+    var giorni  = Math.floor(diff / (1000*60*60*24));
+    var ore     = Math.floor((diff % (1000*60*60*24)) / (1000*60*60));
+    var minuti  = Math.floor((diff % (1000*60*60)) / (1000*60));
+    var secondi = Math.floor((diff % (1000*60)) / 1000);
+    function pad(n){ return n < 10 ? '0'+n : ''+n; }
+    document.getElementById('cd-giorni').textContent  = pad(giorni);
+    document.getElementById('cd-ore').textContent     = pad(ore);
+    document.getElementById('cd-minuti').textContent  = pad(minuti);
+    document.getElementById('cd-secondi').textContent = pad(secondi);
+  }
+  tick();
+  countdownInterval = setInterval(tick, 1000);
+}
+
+function adminSaveCountdown() {
+  var title = document.getElementById('adm-cd-title').value.trim();
+  var dt    = document.getElementById('adm-cd-datetime').value;
+  var msg   = document.getElementById('adm-cd-msg');
+  if (!dt) { msg.style.color='#CC0000'; msg.textContent='Inserisci una data e orario.'; return; }
+  localStorage.setItem('atlas_countdown', JSON.stringify({ title: title, datetime: dt }));
+  msg.style.color = '#1a7a1a';
+  msg.textContent = '✔ Salvato!';
+  setTimeout(function(){ msg.textContent=''; }, 2500);
+  startCountdown();
+}
+
+function adminClearCountdown() {
+  localStorage.removeItem('atlas_countdown');
+  document.getElementById('adm-cd-title').value = '';
+  document.getElementById('adm-cd-datetime').value = '';
+  var msg = document.getElementById('adm-cd-msg');
+  msg.style.color = '#888';
+  msg.textContent = 'Countdown rimosso.';
+  setTimeout(function(){ msg.textContent=''; }, 2000);
+  document.getElementById('countdown-box').classList.add('hidden');
+  if (countdownInterval) clearInterval(countdownInterval);
+}
+
+function openAdmin() {
+  document.getElementById('admin-overlay').classList.add('open');
+  document.getElementById('admin-pw-input').value = '';
+  document.getElementById('admin-pw-err').textContent = '';
+  if (!adminUnlocked) {
+    document.getElementById('admin-pw-area').style.display = 'flex';
+    document.getElementById('admin-main').style.display = 'none';
+  } else {
+    document.getElementById('admin-pw-area').style.display = 'none';
+    document.getElementById('admin-main').style.display = 'block';
+    renderAdminList();
+    loadCountdownInAdmin();
+  }
+  setTimeout(function(){ document.getElementById('admin-pw-input').focus(); }, 100);
+}
+
+function loadCountdownInAdmin() {
+  var cd = loadCountdown();
+  if (!cd) return;
+  if (cd.title)    document.getElementById('adm-cd-title').value = cd.title;
+  if (cd.datetime) document.getElementById('adm-cd-datetime').value = cd.datetime;
+}
+
 renderHome();
 renderDiary();
 initImporti();
+startCountdown();
 </script>
 <!-- Admin overlay -->
 <div id="admin-overlay" onclick="if(event.target===this)closeAdmin()">
@@ -795,7 +900,25 @@ initImporti();
         <button onclick="adminAddTrade()">+ Aggiungi</button>
       </div>
       <div id="adm-add-err" style="color:#CC0000;font-size:12px;margin-top:6px"></div>
+
+      <h3>⏳ Conto alla rovescia</h3>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div class="form-group">
+          <label style="font-size:12px;font-weight:600;color:#333">Titolo evento</label>
+          <input type="text" id="adm-cd-title" placeholder="Es. Prossima sessione live" style="padding:8px 10px;border:1px solid #ccc;border-radius:5px;font-size:13px;width:100%">
+        </div>
+        <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap">
+          <div class="form-group" style="flex:1;min-width:160px">
+            <label style="font-size:12px;font-weight:600;color:#333">Data e ora</label>
+            <input type="datetime-local" id="adm-cd-datetime" style="padding:8px 10px;border:1px solid #ccc;border-radius:5px;font-size:13px;width:100%">
+          </div>
+          <button onclick="adminSaveCountdown()" style="padding:8px 16px;background:#1a7a1a;color:white;border:none;border-radius:5px;cursor:pointer;font-weight:700;font-size:13px;white-space:nowrap;height:36px">💾 Salva</button>
+          <button onclick="adminClearCountdown()" style="padding:8px 16px;background:#888;color:white;border:none;border-radius:5px;cursor:pointer;font-weight:700;font-size:13px;white-space:nowrap;height:36px">Rimuovi</button>
+        </div>
+        <div id="adm-cd-msg" style="font-size:12px;min-height:16px"></div>
+      </div>
     </div>
+  </div>
   </div>
 </div>
 <!-- Secret click zone -->
