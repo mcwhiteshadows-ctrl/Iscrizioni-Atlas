@@ -274,22 +274,22 @@ Il progetto avanza esclusivamente grazie alle donazioni spontanee della communit
 <script>
 var SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyz8HzCPqk2DpLkoyLnWe9yYLOfpvWSNJIFESMq2pkB474RFU5sk2yxu0K42OynYuPg/exec";
 
-var trades = [
-  { id:1,  data:"2025-12-02", strumento:"QQQ", risultato:243, note:"" },
-  { id:2,  data:"2025-12-03", strumento:"QQQ", risultato:44,  note:"" },
-  { id:3,  data:"2025-12-11", strumento:"QQQ", risultato:7,   note:"" },
-  { id:4,  data:"2025-12-15", strumento:"AMD", risultato:48,  note:"" },
-  { id:5,  data:"2025-12-16", strumento:"QQQ", risultato:75,  note:"" },
-  { id:6,  data:"2025-12-16", strumento:"QQQ", risultato:321, note:"" },
-  { id:7,  data:"2026-01-06", strumento:"QQQ", risultato:72,  note:"" },
-  { id:8,  data:"2026-01-15", strumento:"QQQ", risultato:118, note:"" },
-  { id:9,  data:"2026-01-15", strumento:"QQQ", risultato:204, note:"" },
-  { id:10, data:"2026-01-21", strumento:"QQQ", risultato:-89, note:"" },
-  { id:11, data:"2026-02-03", strumento:"QQQ", risultato:389, note:"" },
-  { id:12, data:"2026-02-03", strumento:"QQQ", risultato:68,  note:"" },
-  { id:13, data:"2026-02-03", strumento:"QQQ", risultato:29,  note:"" },
-  { id:14, data:"2026-02-03", strumento:"QQQ", risultato:62,  note:"" }
-];
+var trades = [];
+
+function loadTrades() {
+  fetch(SCRIPT_URL + '?action=get_trades')
+    .then(function(r){ return r.json(); })
+    .then(function(data) {
+      trades = data || [];
+      renderHome();
+      renderDiary();
+      renderChart();
+    })
+    .catch(function(err){
+      console.error('Errore caricamento trade:', err);
+      renderHome(); renderDiary(); renderChart();
+    });
+}
 
 var filterType = "tutti";
 var sortKey = "data";
@@ -753,27 +753,48 @@ function renderAdminList() {
 }
 
 function adminSaveTrade(id) {
-  for (var i = 0; i < trades.length; i++) {
-    if (trades[i].id === id) {
-      trades[i].data = document.getElementById('adm-d-'+id).value;
-      trades[i].strumento = document.getElementById('adm-s-'+id).value;
-      trades[i].risultato = parseFloat(document.getElementById('adm-r-'+id).value) || 0;
-      trades[i].note = document.getElementById('adm-n-'+id).value;
-      break;
-    }
-  }
-  renderHome(); renderDiary(); renderChart();
+  var d = document.getElementById('adm-d-'+id).value;
+  var s = document.getElementById('adm-s-'+id).value;
+  var r = parseFloat(document.getElementById('adm-r-'+id).value) || 0;
+  var n = document.getElementById('adm-n-'+id).value;
+  var btn = document.querySelector('#adm-row-'+id+' .adm-save');
+  if (btn) { btn.textContent = '⏳'; btn.disabled = true; }
+  fetch(SCRIPT_URL + '?action=save_trade&id=' + id
+    + '&data=' + encodeURIComponent(d)
+    + '&strumento=' + encodeURIComponent(s)
+    + '&risultato=' + encodeURIComponent(r)
+    + '&note=' + encodeURIComponent(n))
+    .then(function(resp){ return resp.json(); })
+    .then(function(res) {
+      if (res.ok) {
+        for (var i = 0; i < trades.length; i++) {
+          if (trades[i].id === id) { trades[i].data=d; trades[i].strumento=s; trades[i].risultato=r; trades[i].note=n; break; }
+        }
+        if (btn) { btn.textContent='✔'; btn.disabled=false; setTimeout(function(){ btn.textContent='Salva'; },2000); }
+        renderHome(); renderDiary(); renderChart();
+      } else {
+        if (btn) { btn.textContent='❌'; btn.disabled=false; setTimeout(function(){ btn.textContent='Salva'; },2000); }
+      }
+    })
+    .catch(function(){
+      if (btn) { btn.textContent='❌'; btn.disabled=false; setTimeout(function(){ btn.textContent='Salva'; },2000); }
+    });
 }
 
 function adminDeleteTrade(id) {
   if (!confirm('Eliminare questo trade?')) return;
-  var newList = [];
-  for (var i = 0; i < trades.length; i++) {
-    if (trades[i].id !== id) newList.push(trades[i]);
-  }
-  trades = newList;
-  renderAdminList();
-  renderHome(); renderDiary(); renderChart();
+  fetch(SCRIPT_URL + '?action=delete_trade&id=' + id)
+    .then(function(resp){ return resp.json(); })
+    .then(function(res) {
+      if (res.ok) {
+        trades = trades.filter(function(t){ return t.id !== id; });
+        renderAdminList();
+        renderHome(); renderDiary(); renderChart();
+      } else {
+        alert('Errore eliminazione.');
+      }
+    })
+    .catch(function(){ alert('Errore connessione.'); });
 }
 
 function adminAddTrade() {
@@ -783,16 +804,33 @@ function adminAddTrade() {
   var n = document.getElementById('adm-new-note').value.trim();
   var err = document.getElementById('adm-add-err');
   if (!d || !s || r === '') { err.textContent = 'Data, strumento e risultato sono obbligatori.'; return; }
-  err.textContent = '';
-  var newId = 1;
-  for (var i = 0; i < trades.length; i++) if (trades[i].id >= newId) newId = trades[i].id + 1;
-  trades.push({ id: newId, data: d, strumento: s, risultato: parseFloat(r), note: n });
-  document.getElementById('adm-new-data').value = '';
-  document.getElementById('adm-new-str').value = '';
-  document.getElementById('adm-new-ris').value = '';
-  document.getElementById('adm-new-note').value = '';
-  renderAdminList();
-  renderHome(); renderDiary(); renderChart();
+  err.style.color = '#888';
+  err.textContent = '⏳ Salvataggio...';
+  var url = SCRIPT_URL + '?action=add_trade'
+    + '&data=' + encodeURIComponent(d)
+    + '&strumento=' + encodeURIComponent(s)
+    + '&risultato=' + encodeURIComponent(r)
+    + '&note=' + encodeURIComponent(n);
+  fetch(url)
+    .then(function(resp){ return resp.json(); })
+    .then(function(res) {
+      if (res.ok) {
+        trades.push({ id: res.id, data: d, strumento: s, risultato: parseFloat(r), note: n });
+        document.getElementById('adm-new-data').value = '';
+        document.getElementById('adm-new-str').value = '';
+        document.getElementById('adm-new-ris').value = '';
+        document.getElementById('adm-new-note').value = '';
+        err.style.color = '#1a7a1a';
+        err.textContent = '✔ Trade salvato!';
+        setTimeout(function(){ err.textContent = ''; err.style.color = '#CC0000'; }, 3000);
+        renderAdminList();
+        renderHome(); renderDiary(); renderChart();
+      } else {
+        err.style.color = '#CC0000';
+        err.textContent = 'Errore server.';
+      }
+    })
+    .catch(function(){ err.style.color = '#CC0000'; err.textContent = 'Errore connessione.'; });
 }
 
 /* ===== COUNTDOWN ===== */
@@ -896,8 +934,7 @@ function openAdmin() {
   setTimeout(function(){ document.getElementById('admin-pw-input').focus(); }, 100);
 }
 
-renderHome();
-renderDiary();
+loadTrades();
 startCountdown();
 </script>
 <!-- Admin overlay -->
