@@ -124,7 +124,7 @@ tr:nth-child(even) td { background: #f5f9ff; }
   <button class="active" onclick="showPage('home',this)">Home</button>
   <button onclick="showPage('diario',this)">Diario</button>
   <button onclick="showPage('risultati',this)">Risultati</button>
-  <button onclick="showPage('community',this)">Community</button>
+  <button onclick="window.open('http://135.181.192.152:8000','_blank')">Community</button>
 </nav>
 
 <div class="container">
@@ -252,9 +252,9 @@ Il progetto avanza esclusivamente grazie alle donazioni spontanee della communit
         </div>
       </div>
       <div id="donazione-box" style="display:none;background:#EBF3FB;border-radius:8px;padding:16px;margin-top:4px;margin-bottom:14px;">
-        <div style="font-size:12px;font-weight:600;margin-bottom:8px;color:#1F4E79;">Donazione (100 – 350 €) *</div>
+        <div style="font-size:12px;font-weight:600;margin-bottom:8px;color:#1F4E79;">Donazione </div>
         <div style="font-size:11px;color:#555;margin-bottom:10px;">Il contributo è un'erogazione liberale a fondo perduto a supporto della ricerca tecnologica, senza alcuna promessa di rendimento.</div>
-        <input type="number" id="f-donazione" placeholder="Importo in euro" min="100" max="350"
+        <input type="number" id="f-donazione" placeholder="Importo in euro" min="10" max="300"
           style="padding:9px 12px;border:1px solid #ccc;border-radius:6px;font-size:13px;width:200px;">
         <span class="err-msg" id="err-donazione" style="display:block;margin-top:4px;"></span>
       </div>
