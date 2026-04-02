@@ -130,7 +130,7 @@ tr:nth-child(even) td { background: #f5f9ff; }
   <button class="active" onclick="showPage('home',this)">Home</button>
   <button onclick="showPage('diario',this)">Diario</button>
   <button onclick="showPage('risultati',this)">Risultati</button>
-  <button onclick="showPage('community',this)">Community</button>
+  <button onclick="window.open('http://135.181.192.152:8000/','_blank')">Community</button>
 </nav>
 
 <div class="container">
@@ -217,62 +217,56 @@ Il progetto avanza esclusivamente grazie alle donazioni spontanee della communit
   <div id="page-community" class="page">
     <div id="comm-form-area">
       <div class="comm-hero">
-        <h2>Iscriviti ad Egida Shield</h2>
-        <p>Compila il modulo per richiedere l'accesso alla piattaforma. Riceverai le credenziali via email.</p>
+        <h2>Unisciti alla Community</h2>
+        <p>Compila il modulo per manifestare il tuo interesse alla community Atlas Shield..</p>
       </div>
       <div class="form-grid2">
         <div class="form-group">
           <label>Nome *</label>
-          <input type="text" id="f-nome" placeholder="Mario">
+          <input type="text" id="f-nome">
           <span class="err-msg" id="err-nome"></span>
         </div>
         <div class="form-group">
           <label>Cognome *</label>
-          <input type="text" id="f-cognome" placeholder="Rossi">
+          <input type="text" id="f-cognome">
           <span class="err-msg" id="err-cognome"></span>
         </div>
         <div class="form-group" style="grid-column:1/-1">
           <label>Username *</label>
-          <input type="text" id="f-username" placeholder="mario.rossi">
+          <input type="text" id="f-username" placeholder="@tuousername">
           <span class="err-msg" id="err-username"></span>
         </div>
-        <div class="form-group">
-          <label>Email *</label>
-          <input type="email" id="f-email" placeholder="mario@email.com">
-          <span class="err-msg" id="err-email"></span>
-        </div>
-        <div class="form-group">
-          <label>Telefono</label>
-          <input type="tel" id="f-telefono" placeholder="+39 333 1234567">
-        </div>
-        <div class="form-group" style="grid-column:1/-1">
-          <label>Password (min. 6 caratteri) *</label>
-          <input type="password" id="f-password" placeholder="········" autocomplete="new-password">
-          <span class="err-msg" id="err-password"></span>
-        </div>
-        <div class="form-group" style="grid-column:1/-1">
-          <label>Modalità *</label>
-          <select id="f-modalita" onchange="onModalitaChange(this.value)" style="padding:9px 12px;border:1px solid #ccc;border-radius:6px;font-size:13px;width:100%;">
-            <option value="Autonomo">Autonomo</option>
-            <option value="NON Autonomo">NON Autonomo</option>
-          </select>
-        </div>
       </div>
-      <div id="donazione-box" style="display:none;background:#EBF3FB;border-radius:8px;padding:16px;margin-top:4px;margin-bottom:14px;">
-        <div style="font-size:12px;font-weight:600;margin-bottom:8px;color:#1F4E79;">Donazione (100 – 350 €) *</div>
-        <div style="font-size:11px;color:#555;margin-bottom:10px;">Il contributo è un'erogazione liberale a fondo perduto a supporto della ricerca tecnologica, senza alcuna promessa di rendimento.</div>
-        <input type="number" id="f-donazione" placeholder="Importo in euro" min="100" max="350"
-          style="padding:9px 12px;border:1px solid #ccc;border-radius:6px;font-size:13px;width:200px;">
-        <span class="err-msg" id="err-donazione" style="display:block;margin-top:4px;"></span>
+      <div class="contatti-box">
+        <div style="font-size:12px;font-weight:600;margin-bottom:10px">Contatti (almeno uno obbligatorio)</div>
+        <div class="form-grid2">
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="f-email" placeholder="nome@email.com">
+          </div>
+          <div class="form-group">
+            <label>Telefono</label>
+            <input type="tel" id="f-telefono" placeholder="+39 000 000 0000">
+          </div>
+        </div>
+        <span class="err-msg" id="err-contatti"></span>
       </div>
-      <span class="err-msg" id="err-generale" style="display:block;margin-bottom:8px;"></span>
-      <button class="submit-btn" id="submit-btn" onclick="submitRegistrazione()">&#9654;&nbsp; INVIA RICHIESTA</button>
+      <div>
+        <div style="font-size:12px;font-weight:600;margin-bottom:8px">Questo contributo è facoltativo e serve esclusivamente a supportare l'iniziativa?</div>
+        <div class="importi-grid" id="importi-grid"></div>
+        <div id="altro-box" style="display:none;margin-top:10px">
+          <input type="number" id="f-altro" placeholder="Importo in euro" style="padding:9px 12px;border:1px solid #ccc;border-radius:6px;font-size:13px;width:200px">
+          <span class="err-msg" id="err-altro"></span>
+       </div>
+        <div style="font-size:12px;font-weight:600;margin-top:10px">Il contributo è volontario e non rappresenta l'acquisto di un prodotto o servizio.</div>
+      </div>
+      <button class="submit-btn" id="submit-btn" onclick="submitForm()">Contribuisci</button>
     </div>
     <div id="comm-success" class="success-box" style="display:none">
       <div style="font-size:56px;margin-bottom:16px">&#127881;</div>
-      <h2>Richiesta inviata!</h2>
-      <p>Grazie <strong id="success-name"></strong>! Abbiamo ricevuto la tua richiesta di iscrizione. Ti contatteremo al più presto con le credenziali di accesso.</p>
-      <button class="btn-primary" onclick="resetRegistrazione()">Nuova richiesta</button>
+      <h2>Richiesta di contributo inviata!</h2>
+      <p>Grazie <strong id="success-name"></strong>! Abbiamo ricevuto la tua richiesta,  Ti contatteremo al piu' presto.</p>
+      <button class="btn-primary" onclick="resetForm()">Nuova richiesta</button>
     </div>
   </div>
 
@@ -628,86 +622,82 @@ function renderChart() {
   document.getElementById("chart").innerHTML = html || '<div style="color:#aaa;font-size:13px;padding:10px">Nessun dato per questo periodo.</div>';
 }
 
-var API_BASE = 'http://localhost:8000';
+var selectedImporto = "50";
+var importiList = ["75","100","125","150","175","200","250","Altro"];
 
-function onModalitaChange(val) {
-  document.getElementById('donazione-box').style.display = val === 'NON Autonomo' ? 'block' : 'none';
-  document.getElementById('f-donazione').value = '';
-  document.getElementById('err-donazione').textContent = '';
+function initImporti() {
+  var html = "";
+  for (var i = 0; i < importiList.length; i++) {
+    var v = importiList[i];
+    var label = v === "Altro" ? "Altro" : v + " euro";
+    var sel = v === "50" ? " sel" : "";
+    html += '<button class="imp-btn' + sel + '" onclick="selectImporto(\'' + v + '\',this)">' + label + '</button>';
+  }
+  document.getElementById("importi-grid").innerHTML = html;
 }
 
-async function submitRegistrazione() {
-  var btn = document.getElementById('submit-btn');
-  var nome     = document.getElementById('f-nome').value.trim();
-  var cognome  = document.getElementById('f-cognome').value.trim();
-  var username = document.getElementById('f-username').value.trim();
-  var email    = document.getElementById('f-email').value.trim();
-  var telefono = document.getElementById('f-telefono').value.trim();
-  var password = document.getElementById('f-password').value;
-  var modalita = document.getElementById('f-modalita').value;
-  var donazione = document.getElementById('f-donazione').value.trim();
+function selectImporto(val, btn) {
+  selectedImporto = val;
+  var btns = document.querySelectorAll(".imp-btn");
+  for (var i = 0; i < btns.length; i++) btns[i].classList.remove("sel");
+  btn.classList.add("sel");
+  document.getElementById("altro-box").style.display = val === "Altro" ? "block" : "none";
+}
 
-  // Reset errori
-  ['nome','cognome','username','email','password','donazione','generale'].forEach(function(id) {
-    var el = document.getElementById('err-' + id);
-    if (el) { el.textContent = ''; }
-  });
-
+function submitForm() {
   var valid = true;
-  if (!nome)     { document.getElementById('err-nome').textContent = 'Campo obbligatorio'; valid = false; }
-  if (!cognome)  { document.getElementById('err-cognome').textContent = 'Campo obbligatorio'; valid = false; }
-  if (!username) { document.getElementById('err-username').textContent = 'Campo obbligatorio'; valid = false; }
-  if (!email)    { document.getElementById('err-email').textContent = 'Campo obbligatorio'; valid = false; }
-  if (!password || password.length < 6) { document.getElementById('err-password').textContent = 'Minimo 6 caratteri'; valid = false; }
-  if (modalita === 'NON Autonomo') {
-    var don = parseInt(donazione, 10);
-    if (!donazione || isNaN(don) || don < 100 || don > 350) {
-      document.getElementById('err-donazione').textContent = 'Inserisci un importo tra 100 e 350 euro';
-      valid = false;
-    }
-  }
+  var nome     = document.getElementById("f-nome").value.trim();
+  var cognome  = document.getElementById("f-cognome").value.trim();
+  var username = document.getElementById("f-username").value.trim();
+  var email    = document.getElementById("f-email").value.trim();
+  var telefono = document.getElementById("f-telefono").value.trim();
+  var altro    = document.getElementById("f-altro").value.trim();
+
+  document.getElementById("err-nome").textContent     = "";
+  document.getElementById("err-cognome").textContent  = "";
+  document.getElementById("err-username").textContent = "";
+  document.getElementById("err-contatti").textContent = "";
+  document.getElementById("err-altro").textContent    = "";
+
+  if (nome     === "") { document.getElementById("err-nome").textContent     = "Campo obbligatorio"; valid = false; }
+  if (cognome  === "") { document.getElementById("err-cognome").textContent  = "Campo obbligatorio"; valid = false; }
+  if (username === "") { document.getElementById("err-username").textContent = "Campo obbligatorio"; valid = false; }
+  if (email === "" && telefono === "") { document.getElementById("err-contatti").textContent = "Inserisci almeno email o telefono"; valid = false; }
+  if (selectedImporto === "Altro" && altro === "") { document.getElementById("err-altro").textContent = "Specifica l importo"; valid = false; }
   if (!valid) return;
 
+  var importo = selectedImporto === "Altro" ? altro + " euro" : selectedImporto + " euro";
+  var btn = document.getElementById("submit-btn");
   btn.disabled = true;
-  btn.textContent = 'Invio in corso...';
+  btn.textContent = "Invio in corso...";
 
-  var payload = { nome: nome, cognome: cognome, username: username, email: email,
-                  telefono: telefono, password: password, modalita: modalita };
-  if (modalita === 'NON Autonomo') payload.donazione = parseInt(donazione, 10);
+  var p = new URLSearchParams();
+  p.append("nome", nome);
+  p.append("cognome", cognome);
+  p.append("username", username);
+  p.append("email", email);
+  p.append("telefono", telefono);
+  p.append("importo", importo);
 
-  try {
-    var r = await fetch(API_BASE + '/register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-    var d = await r.json();
-    if (!r.ok) {
-      document.getElementById('err-generale').textContent = d.detail || 'Errore durante la registrazione';
-      btn.disabled = false;
-      btn.innerHTML = '&#9654;&nbsp; INVIA RICHIESTA';
-    } else {
-      document.getElementById('success-name').textContent = nome;
-      document.getElementById('comm-form-area').style.display = 'none';
-      document.getElementById('comm-success').style.display = 'block';
-    }
-  } catch(e) {
-    document.getElementById('err-generale').textContent = 'Server non raggiungibile — riprova';
-    btn.disabled = false;
-    btn.innerHTML = '&#9654;&nbsp; INVIA RICHIESTA';
-  }
+  var img = new Image();
+  img.src = SCRIPT_URL + "?" + p.toString();
+
+  setTimeout(function() {
+    document.getElementById("comm-form-area").style.display = "none";
+    document.getElementById("success-name").textContent = nome;
+    document.getElementById("comm-success").style.display = "block";
+  }, 2000);
 }
 
-function resetRegistrazione() {
-  document.getElementById('comm-success').style.display = 'none';
-  document.getElementById('comm-form-area').style.display = 'block';
-  ['f-nome','f-cognome','f-username','f-email','f-telefono','f-password','f-donazione'].forEach(function(id) {
-    document.getElementById(id).value = '';
-  });
-  document.getElementById('f-modalita').value = 'Autonomo';
-  document.getElementById('donazione-box').style.display = 'none';
-  document.getElementById('submit-btn').disabled = false;
-  document.getElementById('submit-btn').innerHTML = '&#9654;&nbsp; INVIA RICHIESTA';
+function resetForm() {
+  document.getElementById("comm-success").style.display = "none";
+  document.getElementById("comm-form-area").style.display = "block";
+  var ids = ["f-nome","f-cognome","f-username","f-email","f-telefono","f-altro"];
+  for (var i = 0; i < ids.length; i++) document.getElementById(ids[i]).value = "";
+  selectedImporto = "50";
+  document.getElementById("submit-btn").disabled = false;
+  document.getElementById("submit-btn").textContent = "Invia richiesta di adesione";
+  initImporti();
 }
 
 
@@ -911,6 +901,7 @@ function openAdmin() {
 renderHome();
 renderDiary();
 startCountdown();
+initImporti();
 </script>
 <!-- Admin overlay -->
 <div id="admin-overlay" onclick="if(event.target===this)closeAdmin()">
