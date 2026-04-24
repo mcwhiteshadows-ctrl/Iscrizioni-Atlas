@@ -565,7 +565,7 @@ main { flex: 1; width: 100%; max-width: 1300px; margin: 0 auto; padding: 32px 24
   <div class="main-tab" id="tab-btn-cronologia" onclick="switchTab('cronologia')">
     <span class="main-tab-icon">📋</span> CRONOLOGIA
   </div>
-  <div class="main-tab" id="tab-btn-guadagni" onclick="switchTab('guadagni')">
+  <div class="main-tab" id="tab-btn-guadagni" onclick="switchTab('guadagni')" style="display:none">
     <span class="main-tab-icon">📁</span> IL MIO STORICO
   </div>
   <div class="main-tab" id="tab-btn-eventi" onclick="switchTab('eventi')">
@@ -1223,6 +1223,8 @@ async function doLogin(event) {
         .then(function(data){
           if (!data) return;
           var mod = data.modalita || 'Autonomo';
+          if (mod === 'Autonomo') document.getElementById('tab-btn-guadagni').style.display = 'none';
+else else document.getElementById('tab-btn-guadagni').style.display = '';
           var modKey = mod === 'NON Autonomo' ? 'non-autonomo' : 'autonomo';
           var pill = document.getElementById('pill-modalita');
           pill.textContent = mod;
