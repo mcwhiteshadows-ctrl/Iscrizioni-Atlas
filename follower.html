@@ -1224,7 +1224,7 @@ async function doLogin(event) {
           if (!data) return;
           var mod = data.modalita || 'Autonomo';
           if (mod === 'Autonomo') document.getElementById('tab-btn-guadagni').style.display = 'none';
-else else document.getElementById('tab-btn-guadagni').style.display = '';
+else document.getElementById('tab-btn-guadagni').style.display = '';
           var modKey = mod === 'NON Autonomo' ? 'non-autonomo' : 'autonomo';
           var pill = document.getElementById('pill-modalita');
           pill.textContent = mod;
